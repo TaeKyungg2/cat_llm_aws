@@ -3,10 +3,9 @@ from pydantic import BaseModel
 from openai import OpenAI
 import os
 from fastapi.middleware.cors import CORSMiddleware
-from langchain.agents import initialize_agent, Tool
-from langchain_openai import ChatOpenAI
 import json
 from catstyle_talk import make_cat_style_by_pos
+from langchain_openai import ChatOpenAI
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -19,8 +18,7 @@ app.add_middleware(
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class ChatRequest(BaseModel):
     message: str
-
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.8)
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.8)
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
@@ -43,6 +41,7 @@ async def chat(request: ChatRequest):
     response = llm.invoke(system_prompt + "\n\n사용자 메시지: " + prompt)
     try:
         result = json.loads(response.content)
-        return {"answer": result["answer"], "image_id": result["image_id"]}
+        catstyle=make_cat_style_by_pos(result["answer"])
+        return {"answer": catstyle, "image_id": result["image_id"]}
     except Exception as e:
         return {"error": f"JSON 파싱 실패: {str(e)}", "raw": response.content}
