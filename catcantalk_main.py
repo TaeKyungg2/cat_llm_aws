@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from langchain.agents import initialize_agent, Tool
 from langchain_openai import ChatOpenAI
 import json
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -14,30 +15,13 @@ app.add_middleware(
     allow_methods=["*"],  # GET, POST, OPTIONS 다 허용
     allow_headers=["*"],
 )
+
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class ChatRequest(BaseModel):
     message: str
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.8)
 
-
-
-
-
-# @app.post("/chat")
-# async def chat(request: ChatRequest):
-#     print(f"Received message: {request.message}")
-#     try:
-#         response=agent.run(request.message)
-#         if type(response)==str:
-#             answer = response
-#             image_id = None
-#         elif type(response)==dict:
-#             answer = response.get("answer")
-#             image_id = response.get("image_id")
-#         return {"answer": answer,"image_id":image_id}
-#     except Exception as e:
-#         return {"error": str(e)}
 @app.post("/chat")
 async def chat(request: ChatRequest):
     print(f"User Message: {request.message}")
@@ -52,7 +36,7 @@ async def chat(request: ChatRequest):
                     예시:
                     {
                         "answer": "그렇게 말씀하시니 너무 안타깝네요. 괜찮으신가요?",
-                        "image_id": "sad"
+                        "image_id": "sad.gif"
                     }
                     """
     prompt = f"{request.message} 이 말에 대한 감정 응답을 위 기준에 맞게 JSON으로 작성해줘."
