@@ -27,4 +27,3 @@ def add_space_and_pos(str):
         final_str=[*final_str,*okt.pos(i)]
         final_str+= [(' ','Space')]
     return final_str
-print(make_cat_style_by_pos('저는 곽태경이고 컴퓨터를 좋아합니다.'))

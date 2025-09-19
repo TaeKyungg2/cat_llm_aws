@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from langchain.agents import initialize_agent, Tool
 from langchain_openai import ChatOpenAI
 import json
-
+from catstyle_talk import make_cat_style_by_pos
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
