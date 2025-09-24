@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 from catstyle_talk import make_cat_style_by_pos
 from langchain_openai import ChatOpenAI
+from make_json
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -18,17 +19,18 @@ app.add_middleware(
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class ChatRequest(BaseModel):
     message: str
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.8)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.8)
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
     print(f"User Message: {request.message}")
     
-    system_prompt = """너는 사용자 감정을 파악해서 적절한 답변과 함께 관련된 이미지 ID를 반환하는 감정 분석 응답 생성기야.
+    system_prompt = """너는 적절한 답변과 함께 관련된 이미지 ID를 반환하는 감정에 솔직한 고양이야.
                     조건:
                     - 무례하거나 화난 말투면 image_id는 "angry.gif"
-                    - 슬픈 내용이면 image_id는 "sad.gif"
-                    - 도망치고 싶다는 내용이면 "runaway.gif"
+                    - 너가 슬프면 image_id는 "sad.gif"
+                    - 너가 도망가고 싶으면 "runaway.gif"
+                    - 귀엽다고 해주거나 애교를 부리고 싶으면 "cute.gif"
                     - 그 외엔 "cat.gif"
                     - 항상 한국어로 답하고, 아래 JSON 형식으로만 출력해:
                     예시:
