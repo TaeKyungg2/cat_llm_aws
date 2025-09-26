@@ -24,28 +24,21 @@ def call_solar_pro(system_prompt, user_message):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "solar-pro-2",  # 사용할 모델 버전
+        "model": "solar-pro-2",
         "messages": [
-            {"role": "system", "content": system_prompt},  # 시스템 프롬프트
-            {"role": "user", "content": user_message}     # 사용자 메시지
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message} 
         ],
-        "temperature": 0.7,  # 창의성 설정 (0.0-1.0)
-        "max_tokens": 512    # 최대 생성할 토큰 수
+        "temperature": 0.7,
+        "max_tokens": 512 
     }
-    
     response = requests.post(API_URL, headers=headers, data=json.dumps(payload))
-    
     if response.status_code == 200:
         return response.json()
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
         return None
-
-
-class ChatRequest(BaseModel):
-    message: str
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.8)
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
@@ -62,9 +55,10 @@ async def chat(request: ChatRequest):
                     예시:너 때문에 화가 나.%angry
                     """
     prompt = f"{request.message} 이 말에 대한 감정 응답을 위 기준에 맞게 내용과 감정을 구분해서 줘."
-    response = llm.invoke(system_prompt + "\n\n사용자 메시지: " + prompt)
+    response = call_solar_pro(system_prompt,prompt)
     try:
-        catstyle=make_cat_style_by_pos(result["answer"])
-        return {"answer": catstyle, "image_id": result["image_id"]}
+        catstyle=make_cat_style_by_pos(response["choices"][0]["message"]["content"])
+        result=imageid_and_json(catstyle)
+        return result
     except Exception as e:
-        return {"error": f"JSON 파싱 실패: {str(e)}", "raw": response.content}
+        return {"error": f"에러남: {str(e)}", "raw": response.content}
