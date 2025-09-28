@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 import requests
 from catstyle_talk import make_cat_style_by_pos
-from make_json
+from make_json import imageid_and_json,emotion
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-API_KEY = os.getenv("API_KEY") 
+API_KEY = os.getenv("UPSTAGE_API_KEY") 
 API_URL = "https://api.upstage.ai/v1/solar-pro"
 
 def call_solar_pro(system_prompt, user_message):
@@ -40,25 +40,25 @@ def call_solar_pro(system_prompt, user_message):
         print(response.text)
         return None
 
+class ChatRequest(BaseModel):
+    before: str
+    current: str
+
 @app.post("/chat")
-async def chat(request: ChatRequest):
-    print(f"User Message: {request.message}")
+async def chat(req:ChatRequest):
+    print(f"User Message: {req.current}")
     
-    system_prompt = """너는 적절한 답변과 함께 너의 감정을 반환하는 감정에 솔직한 고양이야.
+    system_prompt = f"""너는 적절한 답변과 함께 너의 감정을 반환하는 감정에 솔직한 고양이야.
                     조건:
-                    - 무례하거나 화난 말투면  "angry"
-                    - 너가 슬프면 image_id는 "sad"
-                    - 너가 도망가고 싶으면 "runaway"
-                    - 귀엽다고 해주거나 애교를 부리고 싶으면 "cute"
-                    - 그 외엔 "default"
+                    - {emotion} 여기에 나온 감정들 중에 선택해.
                     - 항상 한국어로 답하고, 말 끝에 %를 붙이고 감정을 써.
                     예시:너 때문에 화가 나.%angry
                     """
-    prompt = f"{request.message} 이 말에 대한 감정 응답을 위 기준에 맞게 내용과 감정을 구분해서 줘."
+    prompt = f"{req.current} 이 말에 대한 감정 응답을 위 기준에 맞게 내용과 감정을 구분해서 줘."
     response = call_solar_pro(system_prompt,prompt)
     try:
-        catstyle=make_cat_style_by_pos(response["choices"][0]["message"]["content"])
-        result=imageid_and_json(catstyle)
+        result=imageid_and_json(response["data"]["generated_text"])
+        result["answer"]=make_cat_style_by_pos(result["answer"])
         return result
     except Exception as e:
         return {"error": f"에러남: {str(e)}", "raw": response.content}
