@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 API_KEY = os.getenv("UPSTAGE_API_KEY") 
-API_URL = "https://api.upstage.ai/v1/solar-pro"
+API_URL = "https://api.upstage.ai/v1/solar/chat/completions"
 
 def call_solar_pro(system_prompt, user_message):
     headers = {
@@ -24,7 +24,7 @@ def call_solar_pro(system_prompt, user_message):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "solar-pro-2",
+        "model": "solar-pro2",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message} 
@@ -57,8 +57,9 @@ async def chat(req:ChatRequest):
     prompt = f"{req.current} 이 말에 대한 감정 응답을 위 기준에 맞게 내용과 감정을 구분해서 줘."
     response = call_solar_pro(system_prompt,prompt)
     try:
-        result=imageid_and_json(response["data"]["generated_text"])
+        result=imageid_and_json(response["choices"][0]["message"]["content"])
         result["answer"]=make_cat_style_by_pos(result["answer"])
+        print(result)
         return result
     except Exception as e:
-        return {"error": f"에러남: {str(e)}", "raw": response.content}
+        return {"error": f"에러남: {str(e)}", "raw": response}
