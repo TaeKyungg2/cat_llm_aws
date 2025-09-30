@@ -1,2 +1,4 @@
 .env
 cat/
+*.log
+__pycache__/
