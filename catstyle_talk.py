@@ -26,7 +26,7 @@ def make_cat_style_by_pos(sentence):
             else :result+=token.form+',냥.'
         else : result+=token.form
         before_startnum=token.start+token.len
-    for i in len(result)-1:
-        if result[i+1]==' ' and randint(10)>=9:
+    for i in range(len(result)-1):
+        if result[i+1]==' ' and randint(0,9)>=9:
             result=result[:i]+", 냥, "+result[i:]
     return result
