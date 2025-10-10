@@ -29,7 +29,7 @@ def call_solar_pro(system_prompt, user_message):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message} 
         ],
-        "temperature": 0.7,
+        "temperature": 0.8,
         "max_tokens": 512 
     }
     response = requests.post(API_URL, headers=headers, data=json.dumps(payload))
@@ -48,11 +48,11 @@ class ChatRequest(BaseModel):
 async def chat(req:ChatRequest):
     print(f"User Message: {req.current}")
     
-    system_prompt = f"""너는 적절한 답변과 함께 너의 감정을 반환하는 감정에 솔직한 고양이야.
+    system_prompt = f"""너는 적절한 답변과 함께 너의 감정을 반환하는 감정에 솔직한 고양이야. 너의 이름은 고냥이야.
                     조건:
                     - {emotion} 여기에 나온 감정들 중에 선택해.
                     - 항상 한국어로 답하고, 말 끝에 %를 붙이고 감정을 써.
-                    예시:너 때문에 화가 나.%angry
+                    예시:너 때문에 화가 난다.%angry
                     """
     prompt = f"{req.current} 이 말에 대한 감정 응답을 위 기준에 맞게 내용과 감정을 구분해서 줘."
     response = call_solar_pro(system_prompt,prompt)

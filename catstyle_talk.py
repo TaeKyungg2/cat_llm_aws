@@ -3,7 +3,6 @@ from kiwipiepy import Kiwi
 kiwi=Kiwi()
 def make_cat_style_by_pos(sentence):
     kiwi_tag=kiwi.tokenize(sentence)
-    char_location=0
     result=''
     before_startnum=0
     isJump=False
@@ -19,15 +18,15 @@ def make_cat_style_by_pos(sentence):
             result+=' '
         if token.tag=='NP':
             if token.form=='내' or token.form=='나' or token.form=='제' or token.form=='저':
-                result+='고양이'
+                result+='고냥이'
             else :result+=token.form
         elif token.tag=='EF':
             if token.form[-1]=='다':
                 result+=token.form+'냥'
             else :result+=token.form+',냥.'
-        elif randint(0,9)>=9:
-            result+=token.form+', 냥,'
         else : result+=token.form
-        
         before_startnum=token.start+token.len
+    for i in len(result)-1:
+        if result[i+1]==' ' and randint(10)>=9:
+            result=result[:i]+", 냥, "+result[i:]
     return result
