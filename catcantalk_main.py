@@ -29,7 +29,7 @@ def call_solar_pro(system_prompt, user_message):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message} 
         ],
-        "temperature": 0.8,
+        "temperature": 0.9,
         "max_tokens": 512 
     }
     response = requests.post(API_URL, headers=headers, data=json.dumps(payload))
